@@ -1,6 +1,6 @@
 # EyeMark
 
-**EyeMarkn** è un’estensione per Chrome che evidenzia automaticamente gli annunci immobiliari già visualizzati su **Idealista** e **Immobiliare**. Riduce il tempo perso rivedendo annunci già visti e ti permette di concentrarti solo sulle nuove opportunità.
+**EyeMark** è un’estensione per Chrome che evidenzia automaticamente gli annunci immobiliari già visualizzati su **Idealista** e **Immobiliare**. Riduce il tempo perso rivedendo annunci già visti e ti permette di concentrarti solo sulle nuove opportunità.
 
 ---
 
