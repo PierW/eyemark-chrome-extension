@@ -3,6 +3,8 @@
   const STORAGE_KEY = "seenListings";
   const ENABLED_KEY = "extensionEnabled";
 
+  const GALLERY_SELECTOR = ".image-gallery-icon.image-gallery-left-nav, .image-gallery-icon.image-gallery-right-nav";
+
 
   /**
    * Utility: recupera lo storage completo
@@ -27,96 +29,81 @@
   }
 
   /**
-   * Applica lo stile "già visto" se necessario
+   * Processa un singolo annuncio
    */
-  function applySeenState(article, listingId, seenMap) {
+  function processArticle(article, seenMap) {
+    const listingId = article.getAttribute("data-element-id");
+    if (!listingId) return;
+
+    if (article.dataset.processed) return;
+    article.dataset.processed = "true";
+
     if (seenMap?.[SITE_KEY]?.[listingId]) {
       article.classList.add("annuncio-gia-visto");
       return;
     }
+
+    article.addEventListener("click", (e) => {
+      // ❌ click su gallery → NON segnare come visto
+      if (e.target.closest(GALLERY_SELECTOR)) return;
+
+      // ❌ click sul nostro overlay
+      if (e.target.closest(".nmv-overlay")) return;
+
+      // ✅ segna come visto
+      markAsSeen(listingId);
+      article.classList.add("annuncio-gia-visto");
+
+      // 🧹 FIX: rimuovi overlay se presente
+      const overlay = article.querySelector(".nmv-overlay");
+      if (overlay) overlay.remove();
+    });
+
   }
 
   /**
-   * Processa un singolo annuncio
+   * Listener globale per uso gallery
+   * Mostra overlay SOLO al primo utilizzo
    */
-function processArticle(article, seenMap) {
-  const listingId = article.getAttribute("data-element-id");
-  if (!listingId) return;
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest(GALLERY_SELECTOR);
+    if (!btn) return;
 
-  if (article.dataset.processed) return;
-  article.dataset.processed = "true";
+    const article = btn.closest("article[data-element-id]");
+    if (!article) return;
 
-  if (seenMap?.[SITE_KEY]?.[listingId]) {
-    article.classList.add("annuncio-gia-visto");
-    return;
+    if (article.dataset.galleryInteracted) return;
+
+    article.dataset.galleryInteracted = "true";
+    showMarkAsSeenOverlay(article);
+  });
+
+  /**
+   * Overlay "Segna come visto"
+   */
+  function showMarkAsSeenOverlay(container) {
+    if (container.querySelector(".nmv-overlay")) return;
+    if (container.classList.contains("annuncio-gia-visto")) return;
+
+    const overlay = document.createElement("button");
+    overlay.className = "nmv-overlay";
+    overlay.textContent = "Segna come visto";
+
+    overlay.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const listingId = container.getAttribute("data-element-id") || container.id;
+      if (!listingId) return;
+
+      markAsSeen(listingId);
+      container.classList.add("annuncio-gia-visto");
+      overlay.remove();
+    });
+
+    container.style.position = "relative";
+    container.appendChild(overlay);
   }
-
-  article.addEventListener("click", (e) => {
-    // ❌ click su gallery → NON segnare come visto
-    if (
-      e.target.closest(
-        ".image-gallery-icon.image-gallery-left-nav, .image-gallery-icon.image-gallery-right-nav"
-      )
-    ) {
-      return;
-    }
-
-    // ❌ click sul nostro overlay
-    if (e.target.closest(".nmv-overlay")) {
-      return;
-    }
-
-    // ✅ segna come visto
-    markAsSeen(listingId);
-    article.classList.add("annuncio-gia-visto");
-
-    // 🧹 FIX: rimuovi overlay se presente
-    const overlay = article.querySelector(".nmv-overlay");
-    if (overlay) overlay.remove();
-  });
-
-}
-
-
-document.addEventListener("click", (e) => {
-  const btn = e.target.closest(
-    ".image-gallery-icon.image-gallery-left-nav, .image-gallery-icon.image-gallery-right-nav"
-  );
-  if (!btn) return;
-
-  const article = btn.closest("article[data-element-id]");
-  if (!article) return;
-
-  article.dataset.galleryInteracted = "true";
-  showMarkAsSeenOverlay(article);
-});
-
-
-function showMarkAsSeenOverlay(container) {
-  if (container.querySelector(".nmv-overlay")) return;
-  if (container.classList.contains("annuncio-gia-visto")) return;
-
-  const overlay = document.createElement("button");
-  overlay.className = "nmv-overlay";
-  overlay.textContent = "Segna come visto";
-
-  overlay.addEventListener("click", (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    const listingId =
-      container.getAttribute("data-element-id") || container.id;
-
-    if (!listingId) return;
-
-    markAsSeen(listingId);
-    container.classList.add("annuncio-gia-visto");
-    overlay.remove();
-  });
-
-  container.style.position = "relative";
-  container.appendChild(overlay);
-}
 
 
   /**
@@ -126,6 +113,8 @@ function showMarkAsSeenOverlay(container) {
     const articles = document.querySelectorAll(
       "article.item.extended-item[data-element-id]"
     );
+
+    if (!articles.length) return;
 
     getStorage((seenMap) => {
       articles.forEach((article) =>
