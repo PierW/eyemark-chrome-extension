@@ -20,7 +20,15 @@ enabledCheckbox.addEventListener("change", () => {
 resetButton.addEventListener("click", () => {
   if (!confirm("Vuoi davvero resettare tutti gli annunci visti?")) return;
 
-  chrome.storage.local.remove(STORAGE_KEY, reloadCurrentTab);
+  chrome.storage.local.set(
+    {
+      [STORAGE_KEY]: {
+        idealista: {},
+        immobiliare: {}
+      }
+    },
+    reloadCurrentTab
+  );
 });
 
 function reloadCurrentTab() {

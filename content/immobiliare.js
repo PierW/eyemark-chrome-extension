@@ -5,12 +5,31 @@
 
   let observer = null;
   let lastUrl = location.href;
+  let isExtensionAlive = true;
+
+  window.addEventListener("beforeunload", () => {
+    isExtensionAlive = false;
+  });
+
 
   function getStorage(callback) {
-    chrome.storage.local.get([STORAGE_KEY], (result) => {
-      callback(result[STORAGE_KEY] || {});
-    });
+    if (!isExtensionAlive || !chrome?.runtime?.id) return;
+
+    try {
+      chrome.storage.local.get([STORAGE_KEY], (result) => {
+        if (!isExtensionAlive) return;
+
+        const data = result[STORAGE_KEY] || {};
+        data.idealista = data.idealista || {};
+        data.immobiliare = data.immobiliare || {};
+
+        callback(data);
+      });
+    } catch (e) {
+      // contesto già invalidato → ignora silenziosamente
+    }
   }
+
 
   function markAsSeen(listingId) {
     getStorage((data) => {
@@ -66,14 +85,12 @@
     });
   }
 
-  function watchUrlChanges() {
-    setInterval(() => {
-      if (location.href !== lastUrl) {
-        lastUrl = location.href;
-        scanItems();
-      }
-    }, 500);
-  }
+  window.addEventListener("beforeunload", () => {
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+  });
 
   function init() {
     chrome.storage.local.get([ENABLED_KEY], (result) => {
@@ -81,7 +98,6 @@
 
       scanItems();
       observeResults();
-      watchUrlChanges();
     });
   }
 
