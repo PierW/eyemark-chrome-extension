@@ -4,7 +4,6 @@
   const ENABLED_KEY = "extensionEnabled";
 
   let observer = null;
-  let lastUrl = location.href;
   let isExtensionAlive = true;
 
   window.addEventListener("beforeunload", () => {
