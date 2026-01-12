@@ -3,33 +3,14 @@
   const STORAGE_KEY = "seenListings";
   const ENABLED_KEY = "extensionEnabled";
 
-  let isExtensionAlive = true;
-
-  window.addEventListener("beforeunload", () => {
-    isExtensionAlive = false;
-  });
-
-
 
   /**
    * Utility: recupera lo storage completo
    */
   function getStorage(callback) {
-    if (!isExtensionAlive || !chrome?.runtime?.id) return;
-
-    try {
-      chrome.storage.local.get([STORAGE_KEY], (result) => {
-        if (!isExtensionAlive) return;
-
-        const data = result[STORAGE_KEY] || {};
-        data.idealista = data.idealista || {};
-        data.immobiliare = data.immobiliare || {};
-
-        callback(data);
-      });
-    } catch (e) {
-      // contesto già invalidato → ignora silenziosamente
-    }
+    chrome.storage.local.get([STORAGE_KEY], (result) => {
+      callback(result[STORAGE_KEY] || {});
+    });
   }
 
   /**
@@ -62,13 +43,11 @@
     const listingId = article.getAttribute("data-element-id");
     if (!listingId) return;
 
+    // evita doppio binding
     if (article.dataset.processed) return;
     article.dataset.processed = "true";
 
-    if (seenMap?.[SITE_KEY]?.[listingId]) {
-      article.classList.add("annuncio-gia-visto");
-      return; // ⬅️ importante
-    }
+    applySeenState(article, listingId, seenMap);
 
     article.addEventListener("click", () => {
       markAsSeen(listingId);
@@ -97,11 +76,6 @@
   const observer = new MutationObserver(() => {
     scanArticles();
   });
-
-  window.addEventListener("beforeunload", () => {
-    observer.disconnect();
-  });
-
 
   function init() {
 
