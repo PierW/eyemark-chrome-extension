@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "EyeMark",
   "description": "Evidenzia annunci già visti su Idealista e Immobiliare.",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": "Pierpaolo Wurzburger",
   "permissions": ["storage"],
   "icons": {
@@ -14,7 +14,7 @@
     {
       "matches": ["https://www.idealista.it/*"],
       "js": ["content/idealista.js"],
-      "css": ["content/styles.css"]
+      "css": ["content/styles-idealista.css"]
     },
     {
       "matches": ["https://www.immobiliare.it/*"],
