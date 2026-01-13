@@ -1,6 +1,6 @@
 # EyeMark
 
-**EyeMark** è un’estensione per Chrome che evidenzia automaticamente gli annunci immobiliari già visualizzati sui 3 principali player: **Idealista**, **Immobiliare** e **Casa.it**. Riduce il tempo perso rivedendo annunci già visti e ti permette di concentrarti solo sulle nuove opportunità.
+**EyeMark** è un’estensione gratuita e open source per Chrome che evidenzia automaticamente gli annunci immobiliari già visualizzati sui principali player: **Idealista**, **Immobiliare**, **Casa.it** e **Wikicasa**. Riduce il tempo perso rivedendo annunci già visti e ti permette di concentrarti solo sulle nuove opportunità.
 
 ---
 
