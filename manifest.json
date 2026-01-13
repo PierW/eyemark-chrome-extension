@@ -20,6 +20,11 @@
       "matches": ["https://www.immobiliare.it/*"],
       "js": ["content/immobiliare.js"],
       "css": ["content/styles.css"]
+    },
+    {
+      "matches": ["https://www.casa.it/*"],
+      "js": ["content/casa.js"],
+      "css": ["content/styles-casa.css"]
     }
   ],
   "action": {

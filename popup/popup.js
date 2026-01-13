@@ -24,7 +24,8 @@ resetButton.addEventListener("click", () => {
     {
       [STORAGE_KEY]: {
         idealista: {},
-        immobiliare: {}
+        immobiliare: {},
+        casa: {}
       }
     },
     reloadCurrentTab
